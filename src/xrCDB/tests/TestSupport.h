@@ -84,3 +84,4 @@ inline std::string TestPath(pcstr name)
 
 void CheckCacheFailures();
 void CheckLegacyCache();
+void CheckRayEndpoints();

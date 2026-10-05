@@ -264,6 +264,7 @@ int main(int argc, char** argv)
         const auto cache = (std::filesystem::current_path() / (argc > 1 ? "cdb-threaded.cache" : "cdb-sync.cache")).string();
         CheckCache(model, mesh, cache.c_str());
         CheckBoundaryQueries();
+        CheckRayEndpoints();
         CheckRandomQueries();
         CheckCacheFailures();
         CheckLegacyCache();
