@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <EmbreeSmokeSources>$(MSBuildThisFileDirectory)</EmbreeSmokeSources>
+  </PropertyGroup>
+  <!-- Imported into xrCDB.vcxproj so the librarian uses its evaluated settings. -->
+  <Target Name="CheckEmbreeStaticLink" DependsOnTargets="SetBuildDefaultEnvironmentVariables">
+    <Error Condition="'$(ConfigurationType)' != 'StaticLibrary'" Text="The Embree static-link check requires a Master Gold configuration." />
+    <Error Condition="'$(EmbreeSmokeOutput)' == ''" Text="Set EmbreeSmokeOutput to an isolated build directory." />
+    <MakeDir Directories="$(EmbreeSmokeOutput)" />
+    <CL Sources="$(EmbreeSmokeSources)EmbreeStaticDependency.cpp;$(EmbreeSmokeSources)EmbreeStaticConsumer.cpp"
+        AdditionalIncludeDirectories="$(XRAY_EMBREE_ROOT)\include"
+        ObjectFileName="$(EmbreeSmokeOutput)\"
+        RuntimeLibrary="MultiThreadedDLL" PrecompiledHeader="NotUsing"
+        ExceptionHandling="Sync" SuppressStartupBanner="true" TrackFileAccess="false" />
+    <ItemGroup>
+      <Lib Include="$(EmbreeSmokeOutput)\EmbreeStaticDependency.obj" />
+    </ItemGroup>
+    <LIB Sources="@(Lib)"
+         AdditionalDependencies="%(Lib.AdditionalDependencies)"
+         AdditionalLibraryDirectories="%(Lib.AdditionalLibraryDirectories)"
+         OutputFile="$(EmbreeSmokeOutput)\EmbreeStaticDependency.lib"
+         SuppressStartupBanner="true" TrackFileAccess="false" />
+    <!-- The consumer must resolve Embree exclusively through the static library. -->
+    <Link Sources="$(EmbreeSmokeOutput)\EmbreeStaticConsumer.obj;$(EmbreeSmokeOutput)\EmbreeStaticDependency.lib"
+          OutputFile="$(EmbreeSmokeOutput)\EmbreeStaticConsumer.exe"
+          SubSystem="Console" SuppressStartupBanner="true" TrackFileAccess="false" />
+  </Target>
+</Project>

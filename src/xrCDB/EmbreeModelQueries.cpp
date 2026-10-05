@@ -17,6 +17,13 @@ namespace CDB
 {
 namespace
 {
+float CandidateRange(float range)
+{
+    // Embree and TestRayTri can round the same hit to different distances.
+    // Pad traversal bounds, while the filter keeps the exact requested limit.
+    return range > 0.f ? std::nextafter(range * 1.000001f, INFINITY) : range;
+}
+
 struct MeshData
 {
     std::vector<Fvector> vertices;
@@ -130,7 +137,7 @@ public:
                 if (!context.collider->r_count()) context.collider->r_add() = result;
                 else if (distance < context.collider->r_begin()->range) *context.collider->r_begin() = result;
                 context.range = std::min(context.range, distance);
-                RTCRayN_tfar(args->ray, args->N, lane) = std::nextafter(context.range * 1.000001f, INFINITY);
+                RTCRayN_tfar(args->ray, args->N, lane) = CandidateRange(context.range);
             }
             else context.collider->r_add() = result;
 
@@ -214,7 +221,7 @@ void QueryEmbreeModel(const MODEL* model, COLLIDER& collider, u32 rayMode,
     RTCRay ray{};
     ray.org_x = start.x; ray.org_y = start.y; ray.org_z = start.z;
     ray.dir_x = direction.x; ray.dir_y = direction.y; ray.dir_z = direction.z;
-    ray.tnear = 0.f; ray.tfar = range; ray.time = 0.f; ray.mask = 0xFFFFFFFFu; ray.id = 0; ray.flags = 0;
+    ray.tnear = 0.f; ray.tfar = CandidateRange(range); ray.time = 0.f; ray.mask = 0xFFFFFFFFu; ray.id = 0; ray.flags = 0;
     if (rayMode & OPT_ONLYFIRST)
     {
         RTCOccludedArguments args;

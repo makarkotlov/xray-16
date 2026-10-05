@@ -33,6 +33,10 @@
       <AdditionalLibraryDirectories>$(XRAY_EMBREE_ROOT)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>embree4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Lib Condition="'$(XRAY_COLLISION_EMBREE)'=='true'">
+      <AdditionalLibraryDirectories>$(XRAY_EMBREE_ROOT)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>embree4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Frustum.cpp" />
